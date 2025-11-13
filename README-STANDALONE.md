@@ -131,9 +131,21 @@ docker logs --tail 100 <container-id>
 | Docker Compose | 2 | Medium | Manual config |
 | Manual | 1 | Complex | Manual |
 
+## Cloud Deployment
+
+### DigitalOcean App Platform
+
+See [DIGITALOCEAN.md](DIGITALOCEAN.md) for detailed deployment instructions.
+
+Quick deploy:
+```bash
+doctl apps create --spec .do/app.yaml
+```
+
 ## Notes
 
-- Caddy automatically handles HTTP to HTTPS redirect when using a real domain
-- For `localhost`, only HTTP is used (no SSL)
-- SSL certificates are stored in `/data/caddy` - mount as volume for persistence
+- For production, the docker-compose setup is recommended for better separation of concerns
+- This standalone image is ideal for quick deployments or resource-constrained environments
+- SSL certificates are stored in `/data/caddy` - mount this as volume for persistence
+- DigitalOcean App Platform automatically handles SSL/HTTPS
 - First certificate request may take 10-30 seconds

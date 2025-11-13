@@ -1,0 +1,43 @@
+name: whatsmyip
+region: nyc
+
+services:
+  - name: web
+    # Build from Dockerfile.standalone
+    dockerfile_path: Dockerfile.standalone
+    source_dir: /
+    
+    # GitHub repository (update with your repo)
+    github:
+      repo: brabidou/WhatsMyIp
+      branch: main
+      deploy_on_push: true
+    
+    # Instance configuration
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    
+    # HTTP routes
+    http_port: 80
+    
+    # Environment variables
+    envs:
+      - key: DOMAIN
+        value: ${APP_DOMAIN}
+        type: SECRET
+      - key: SYSTEM_LABEL
+        value: "DigitalOceanApp"
+        type: GENERAL
+    
+    # Health check
+    health_check:
+      http_path: /
+      initial_delay_seconds: 10
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
+    
+    # Routes
+    routes:
+      - path: /
