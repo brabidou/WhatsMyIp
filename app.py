@@ -47,8 +47,8 @@ def index():
     # Determine if request came through a proxy
     behind_proxy = bool(x_forwarded_for or x_real_ip)
 
-    #If this is a curl like reqeust just return the IP no nonsense
-    if user_agent == None or user_agent.startswith('curl'):
+    #If this is a curl/wget like request just return the IP no nonsense
+    if user_agent == None or user_agent.lower().startswith('curl') or user_agent.lower().startswith('wget'):
         return raw_ip()
     
     return render_template(
