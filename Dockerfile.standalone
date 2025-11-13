@@ -1,0 +1,40 @@
+# Multi-stage build with Caddy
+FROM caddy:2-builder AS caddy-builder
+RUN xcaddy build
+
+FROM python:3.11-slim
+
+# Install Caddy from builder stage
+COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY app.py .
+COPY templates/ templates/
+
+# Copy Caddyfile
+COPY Caddyfile.standalone /etc/caddy/Caddyfile
+
+# Create directory for Caddy data (SSL certs stored here)
+RUN mkdir -p /data/caddy /config/caddy
+
+# Expose ports
+EXPOSE 80 443
+
+# Environment variables
+ENV FLASK_APP=app.py
+ENV PYTHONUNBUFFERED=1
+ENV DOMAIN=localhost
+ENV SYSTEM_LABEL=""
+
+# Start script
+COPY start-standalone.sh /start.sh
+RUN chmod +x /start.sh
+
+CMD ["/start.sh"]

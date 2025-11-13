@@ -1,0 +1,22 @@
+{
+    # Disable automatic HTTPS redirect
+    auto_https disable_redirects
+}
+
+# HTTP server
+http://{$DOMAIN:localhost} {
+    reverse_proxy localhost:5050
+    
+    log {
+        output stdout
+    }
+}
+
+# HTTPS server
+https://{$DOMAIN:localhost} {
+    reverse_proxy localhost:5050
+    
+    log {
+        output stdout
+    }
+}
