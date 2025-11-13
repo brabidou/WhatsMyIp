@@ -47,8 +47,10 @@ def index():
     # Determine if request came through a proxy
     behind_proxy = bool(x_forwarded_for or x_real_ip)
 
-    #If this is a curl/wget like request just return the IP no nonsense
-    if user_agent == None or user_agent.lower().startswith('curl') or user_agent.lower().startswith('wget'):
+    # If this is a CLI tool request, just return the IP no nonsense
+    cli_tools = ['curl', 'wget', 'httpie', 'fetch', 'lwp-request', 'python-requests', 
+                 'python-urllib', 'go-http-client', 'libwww-perl']
+    if user_agent is None or any(tool in user_agent.lower() for tool in cli_tools):
         return raw_ip()
     
     return render_template(
