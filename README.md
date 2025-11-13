@@ -12,10 +12,33 @@ A simple Flask web application that displays your IP address and connection deta
 
 ## Prerequisites
 
+### For Local Development
 - Python 3.7 or higher
 - pip (Python package installer)
 
-## Installation
+### For Docker
+- Docker installed on your system
+- (Optional) Docker Compose
+
+## Quick Start with Docker
+
+### Pull from GitHub Container Registry
+
+```bash
+docker pull ghcr.io/brabidou/whatsmyip:latest
+docker run -p 5001:5001 ghcr.io/brabidou/whatsmyip:latest
+```
+
+Then visit `http://localhost:5001`
+
+### Build locally
+
+```bash
+docker build -t whatsmyip .
+docker run -p 5001:5001 whatsmyip
+```
+
+## Installation (Local Development)
 
 ### 1. Clone or download this repository
 
@@ -93,11 +116,17 @@ curl http://127.0.0.1:5001/api/ip
 
 ```
 WhatsMyIp/
-├── app.py                 # Main Flask application
+├── .github/
+│   └── workflows/
+│       └── docker-publish.yml  # GitHub Actions workflow
+├── app.py                      # Main Flask application
 ├── templates/
-│   └── index.html        # HTML template with styling
-├── venv/                 # Virtual environment (not committed to git)
-└── README.md            # This file
+│   └── index.html             # HTML template with styling
+├── Dockerfile                  # Docker image definition
+├── .dockerignore              # Docker build exclusions
+├── requirements.txt           # Python dependencies
+├── venv/                      # Virtual environment (not committed to git)
+└── README.md                  # This file
 ```
 
 ## Deactivating the Virtual Environment
@@ -140,6 +169,54 @@ If you see "Address already in use" error, either:
 Make sure you:
 1. Activated the virtual environment (`source venv/bin/activate`)
 2. Installed Flask (`pip install flask`)
+
+## Docker Deployment
+
+### GitHub Container Registry
+
+This project automatically builds and publishes Docker images to GitHub Container Registry (GHCR) on every push to the main branch.
+
+**Workflow triggers:**
+- Push to `main` or `master` branch
+- New version tags (e.g., `v1.0.0`)
+- Manual workflow dispatch
+
+**Image tags:**
+- `latest` - Latest build from main branch
+- `main` - Latest build from main branch
+- `v1.0.0` - Specific version tags
+- `sha-<commit>` - Specific commit builds
+
+### Setting up GitHub Actions
+
+The workflow is already configured in `.github/workflows/docker-publish.yml`. To enable it:
+
+1. Push your code to GitHub
+2. The workflow will automatically run on push to main/master
+3. Images will be published to `ghcr.io/<your-username>/whatsmyip`
+
+**Note:** The `GITHUB_TOKEN` is automatically provided by GitHub Actions, no additional secrets needed.
+
+### Making the image public
+
+By default, GHCR images are private. To make it public:
+
+1. Go to your GitHub profile → Packages
+2. Find the `whatsmyip` package
+3. Click "Package settings"
+4. Scroll down and click "Change visibility"
+5. Select "Public"
+
+### Running the published image
+
+```bash
+# Pull and run latest version
+docker pull ghcr.io/<your-username>/whatsmyip:latest
+docker run -d -p 5001:5001 ghcr.io/<your-username>/whatsmyip:latest
+
+# Run specific version
+docker run -d -p 5001:5001 ghcr.io/<your-username>/whatsmyip:v1.0.0
+```
 
 ## License
 
