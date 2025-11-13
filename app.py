@@ -1,4 +1,4 @@
-from ast import Or
+import os
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
@@ -25,6 +25,13 @@ def get_client_ip():
     # Fall back to remote_addr (direct connection)
     return request.remote_addr
 
+def get_system_info():
+    """
+    Get system info from SYSTEM_INFO environment variable.
+    Returns None if not set.
+    """
+    return os.environ.get('SYSTEM_INFO', None)
+
 @app.route('/')
 def index():
     """Main route that displays the IP address."""
@@ -35,6 +42,7 @@ def index():
     x_real_ip = request.headers.get('X-Real-IP', '')
     remote_addr = request.remote_addr
     user_agent = request.headers.get('User-Agent', None)
+    system_info = get_system_info()
     
     # Determine if request came through a proxy
     behind_proxy = bool(x_forwarded_for or x_real_ip)
@@ -50,7 +58,8 @@ def index():
         x_real_ip=x_real_ip,
         remote_addr=remote_addr,
         user_agent=user_agent,
-        behind_proxy=behind_proxy
+        behind_proxy=behind_proxy,
+        system_info=system_info
     )
 
 @app.route('/raw')

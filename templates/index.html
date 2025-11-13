@@ -137,6 +137,12 @@
                 <span class="info-label">User Agent:</span>
                 <span class="info-value">{{ user_agent }}</span>
             </div>
+            {% if system_info %}
+            <div class="info-item">
+                <span class="info-label">System Info:</span>
+                <span class="info-value">{{ system_info }}</span>
+            </div>            
+            {% endif %}
         </div>
     </div>
 </body>
