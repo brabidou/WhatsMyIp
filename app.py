@@ -1,3 +1,4 @@
+from ast import Or
 from flask import Flask, request, render_template
 
 app = Flask(__name__)
@@ -33,10 +34,14 @@ def index():
     x_forwarded_for = request.headers.get('X-Forwarded-For', '')
     x_real_ip = request.headers.get('X-Real-IP', '')
     remote_addr = request.remote_addr
-    user_agent = request.headers.get('User-Agent', 'Unknown')
+    user_agent = request.headers.get('User-Agent', None)
     
     # Determine if request came through a proxy
     behind_proxy = bool(x_forwarded_for or x_real_ip)
+
+    #If this is a curl like reqeust just return the IP no nonsense
+    if user_agent == None or user_agent.startswith('curl'):
+        return raw_ip()
     
     return render_template(
         'index.html',
@@ -48,7 +53,13 @@ def index():
         behind_proxy=behind_proxy
     )
 
-@app.route('/api/ip')
+@app.route('/raw')
+def raw_ip():
+    """Raw IP endpoint that returns just the IP address."""
+    client_ip = get_client_ip()
+    return client_ip + "\n"
+
+@app.route('/json')
 def api_ip():
     """API endpoint that returns IP as JSON."""
     client_ip = get_client_ip()
@@ -61,4 +72,4 @@ def api_ip():
     }
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5050, debug=True)

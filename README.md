@@ -26,16 +26,16 @@ A simple Flask web application that displays your IP address and connection deta
 
 ```bash
 docker pull ghcr.io/brabidou/whatsmyip:latest
-docker run -p 5001:5001 ghcr.io/brabidou/whatsmyip:latest
+docker run -p 5050:5050 ghcr.io/brabidou/whatsmyip:latest
 ```
 
-Then visit `http://localhost:5001`
+Then visit `http://localhost:5050`
 
 ### Build locally
 
 ```bash
 docker build -t whatsmyip .
-docker run -p 5001:5001 whatsmyip
+docker run -p 5050:5050 whatsmyip
 ```
 
 ## Installation (Local Development)
@@ -90,15 +90,16 @@ python app.py
 ```
 
 3. Open your browser and navigate to:
-   - Web interface: `http://127.0.0.1:5001`
-   - API endpoint: `http://127.0.0.1:5001/api/ip`
+   - Web interface: `http://127.0.0.1:5050`
+   - JSON endpoint: `http://127.0.0.1:5050/json`
+   - Raw endpoint: `http://127.0.0.1:5050/raw`
 
 ## API Usage
 
 ### Get IP as JSON
 
 ```bash
-curl http://127.0.0.1:5001/api/ip
+curl http://127.0.0.1:5050/
 ```
 
 **Response:**
@@ -152,7 +153,7 @@ To change the port, edit `app.py`:
 
 ```python
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)  # Change port here
+    app.run(host='0.0.0.0', port=5050, debug=True)  # Change port here
 ```
 
 ## Troubleshooting
@@ -193,7 +194,7 @@ The workflow is already configured in `.github/workflows/docker-publish.yml`. To
 
 1. Push your code to GitHub
 2. The workflow will automatically run on push to main/master
-3. Images will be published to `ghcr.io/<your-username>/whatsmyip`
+3. Images will be published to `ghcr.io/brabidou/whatsmyip`
 
 **Note:** The `GITHUB_TOKEN` is automatically provided by GitHub Actions, no additional secrets needed.
 
@@ -211,11 +212,11 @@ By default, GHCR images are private. To make it public:
 
 ```bash
 # Pull and run latest version
-docker pull ghcr.io/<your-username>/whatsmyip:latest
-docker run -d -p 5001:5001 ghcr.io/<your-username>/whatsmyip:latest
+docker pull ghcr.io/brabidou/whatsmyip:latest
+docker run -d -p 5050:5050 ghcr.io/brabidou/whatsmyip:latest
 
 # Run specific version
-docker run -d -p 5001:5001 ghcr.io/<your-username>/whatsmyip:v1.0.0
+docker run -d -p 5050:5050 ghcr.io/brabidou/whatsmyip:v1.0.0
 ```
 
 ## License
