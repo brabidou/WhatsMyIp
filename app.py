@@ -25,12 +25,12 @@ def get_client_ip():
     # Fall back to remote_addr (direct connection)
     return request.remote_addr
 
-def get_system_info():
+def get_system_label():
     """
-    Get system info from SYSTEM_INFO environment variable.
+    Get system info from SYSTEM_LABEL environment variable.
     Returns None if not set.
     """
-    return os.environ.get('SYSTEM_INFO', None)
+    return os.environ.get('SYSTEM_LABEL', None)
 
 @app.route('/')
 def index():
@@ -42,7 +42,7 @@ def index():
     x_real_ip = request.headers.get('X-Real-IP', '')
     remote_addr = request.remote_addr
     user_agent = request.headers.get('User-Agent', None)
-    system_info = get_system_info()
+    system_label = get_system_label()
     
     # Determine if request came through a proxy
     behind_proxy = bool(x_forwarded_for or x_real_ip)
@@ -59,7 +59,7 @@ def index():
         remote_addr=remote_addr,
         user_agent=user_agent,
         behind_proxy=behind_proxy,
-        system_info=system_info
+        system_label=system_label
     )
 
 @app.route('/raw')
@@ -72,13 +72,19 @@ def raw_ip():
 def api_ip():
     """API endpoint that returns IP as JSON."""
     client_ip = get_client_ip()
-    return {
+    json_payload = {
         'ip': client_ip,
         'x_forwarded_for': request.headers.get('X-Forwarded-For', ''),
         'x_real_ip': request.headers.get('X-Real-IP', ''),
         'remote_addr': request.remote_addr,
         'behind_proxy': bool(request.headers.get('X-Forwarded-For') or request.headers.get('X-Real-IP'))
     }
+
+    system_label = get_system_label()
+    if system_label:
+        json_payload['system_label'] = system_label
+
+    return json_payload
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5050, debug=True)
