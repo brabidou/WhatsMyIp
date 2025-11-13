@@ -12,5 +12,10 @@ build/
 .git/
 .gitignore
 README.md
+DEPLOYMENT.md
 .DS_Store
 *.log
+docker-compose.yml
+traefik/
+.env
+.env.example

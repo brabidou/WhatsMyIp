@@ -1,0 +1,35 @@
+http:
+  middlewares:
+    # Security headers
+    secureHeaders:
+      headers:
+        sslRedirect: false
+        forceSTSHeader: false
+        stsIncludeSubdomains: false
+        stsPreload: false
+        stsSeconds: 0
+        contentTypeNosniff: true
+        browserXssFilter: true
+        referrerPolicy: "no-referrer-when-downgrade"
+        permissionsPolicy: "camera=(), microphone=(), geolocation=()"
+        customResponseHeaders:
+          X-Robots-Tag: "none,noarchive,nosnippet,notranslate,noimageindex"
+
+    # Rate limiting
+    rateLimit:
+      rateLimit:
+        average: 100
+        burst: 50
+        period: 1m
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+        - TLS_AES_128_GCM_SHA256
+        - TLS_AES_256_GCM_SHA384
+        - TLS_CHACHA20_POLY1305_SHA256

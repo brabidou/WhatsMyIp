@@ -1,0 +1,59 @@
+services:
+  traefik:
+    image: traefik:v2.10
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    ports:
+      - "80:80"     # HTTP
+      - "443:443"   # HTTPS
+    environment:
+      - TZ=America/New_York
+    command:
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik-network"
+      - "--providers.file.filename=/config.yml"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL:-your-email@example.com}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http"
+      - "--log.level=INFO"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/acme.json:/acme.json
+      - ./traefik/config.yml:/config.yml:ro
+    networks:
+      - traefik-network
+
+  whatsmyip:
+    build: .
+    container_name: whatsmyip
+    restart: unless-stopped
+    environment:
+      - SYSTEM_LABEL=${SYSTEM_LABEL:-Production Server}
+    labels:
+      - "traefik.enable=true"
+      # HTTPS router
+      - "traefik.http.routers.whatsmyip-https.rule=Host(`${DOMAIN:-ip.yourdomain.com}`)"
+      - "traefik.http.routers.whatsmyip-https.entrypoints=https"
+      - "traefik.http.routers.whatsmyip-https.tls=true"
+      - "traefik.http.routers.whatsmyip-https.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.whatsmyip-https.service=whatsmyip"
+      # HTTP router (no redirect)
+      - "traefik.http.routers.whatsmyip-http.rule=Host(`${DOMAIN:-ip.yourdomain.com}`)"
+      - "traefik.http.routers.whatsmyip-http.entrypoints=http"
+      - "traefik.http.routers.whatsmyip-http.service=whatsmyip"
+      # Service definition
+      - "traefik.http.services.whatsmyip.loadbalancer.server.port=5050"
+    networks:
+      - traefik-network
+
+networks:
+  traefik-network:
+    name: traefik-network
+    driver: bridge
